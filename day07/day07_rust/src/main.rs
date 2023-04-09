@@ -9,9 +9,11 @@ fn main() {
         Err(e) => println!("Error in part 1: {}", e),
     }
 
-    match day07(show_logs, "../input07.txt") {
-        Ok(x) => println!("Part 1: {}", x),
-        Err(e) => println!("Error in part 1: {}", e),
+    if true {
+        match day07(show_logs, "../input07.txt") {
+            Ok(x) => println!("Part 1: {}", x),
+            Err(e) => println!("Error in part 1: {}", e),
+        }
     }
 }
 
@@ -126,6 +128,31 @@ fn day07(_show_logs: bool, filename: &str) -> Result<i32, Box<dyn Error>> {
         }
     }
 
+    // Part 2:
+
+    let drive_size = 70000000;
+    let required = 30000000;
+    let size_of_root = get_size(&drive, 0);
+    let available = drive_size - size_of_root;
+    let missing = required - available;
+    println!(
+        "root: {} available: {} missing: {}",
+        size_of_root, available, missing
+    );
+
+    let mut enough = Vec::new();
+    for dir in get_all_directries(&drive) {
+        let size = get_size(&drive, dir.id);
+        if size >= missing {
+            enough.push((dir.name.clone(), size));
+            println!("dir: {} {}", dir.name, size);
+        }
+    }
+
+    enough.sort_by(|a, b| a.1.cmp(&b.1));
+
+    println!("enough: {:?}", enough[0]);
+
     return Ok(size_under_100k as i32);
 }
 
@@ -186,9 +213,9 @@ fn get_size(drive: &Vec<Item>, current_i: usize) -> usize {
 
     let current_id = drive[current_i].id;
 
-    if (current_id == 0) {
+    if current_id == 0 {
         for item in drive {
-            if (item.size == 0) {
+            if item.size == 0 {
             } else {
                 size += item.size;
             }
@@ -198,7 +225,7 @@ fn get_size(drive: &Vec<Item>, current_i: usize) -> usize {
 
     for item in drive {
         if item.parent_id == current_id {
-            if (item.size == 0) {
+            if item.size == 0 {
                 size += get_size(drive, item.id);
             } else {
                 size += item.size;
